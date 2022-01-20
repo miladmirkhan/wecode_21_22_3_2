@@ -1,7 +1,13 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:wecode_2021/src/providers/nameProvider.dart';
+import 'package:wecode_2021/src/services/auth_service.dart';
 
 class HomeScreenView extends StatelessWidget {
-  const HomeScreenView({Key? key}) : super(key: key);
+  HomeScreenView({Key? key}) : super(key: key);
+
+  final AuthService _auth = AuthService();
 
   @override
   Widget build(BuildContext context) {
@@ -12,19 +18,99 @@ class HomeScreenView extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const Text(
-              'Welcome',
-              style: TextStyle(fontSize: 32, fontWeight: FontWeight.w300),
-            ),
+            // StreamBuilder<User?>(
+            //     stream: _auth.authStatusChanges,
+            //     builder: (context, snapshot) {
+            //       if (snapshot.hasData) {
+            //         return Text('the user is ${snapshot.data!.email} ');
+            //       } else {
+            //         return Text('no User');
+            //       }
+            //     }),
+
+            Text(Provider.of<AuthService>(context, listen: true).theUser != null
+                ? Provider.of<AuthService>(context, listen: true)
+                    .theUser!
+                    .email!
+                : 'no user'),
+
             Divider(
               color: Colors.indigo,
               height: 25,
             ),
-            ElevatedButton(
-                onPressed: () {
-                  Navigator.pushReplacementNamed(context, '/trainersScreen');
-                },
-                child: Text('Trainers Screen'))
+
+            // show this only to not logged in users
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/login');
+                        },
+                        child: Text('Login')),
+                  ),
+                  VerticalDivider(width: 15),
+                  Expanded(
+                    child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/register');
+                        },
+                        child: Text('register')),
+                  ),
+                ],
+              ),
+            ),
+
+            Provider.of<AuthService>(context).theUser == null
+                ? Container()
+                :
+                // to create a profile
+                Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                primary: Colors.amber,
+                              ),
+                              onPressed: () {
+                                Navigator.of(context)
+                                    .pushNamed('/createProfileScreen');
+                              },
+                              child: Text('Create Profile')),
+                        ),
+                      ],
+                    ),
+                  ),
+
+            //show this only to logged in users
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          primary: Colors.red,
+                        ),
+                        onPressed: () {
+                          Provider.of<AuthService>(context, listen: false)
+                              .logOut();
+                        },
+                        child: Text('Sign Out')),
+                  ),
+                ],
+              ),
+            )
           ],
         ),
       ),

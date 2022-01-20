@@ -1,21 +1,21 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:wecode_2021/src/constants/style.dart';
+import 'package:wecode_2021/src/providers/nameProvider.dart';
 import 'package:wecode_2021/src/services/auth_service.dart';
 import 'package:wecode_2021/src/trainers_screen/trainers_screen_view.dart';
+import 'package:provider/provider.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({Key? key}) : super(key: key);
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _RegisterScreenState extends State<RegisterScreen> {
   String name = 'user name';
   String? password;
-  String? theLoggedInUser;
 
   TextEditingController _userNameController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
@@ -24,18 +24,15 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Login'),
+        title: Text('Registeration'),
       ),
       body: Container(
         margin: EdgeInsets.all(15),
         child: Column(
           children: [
-            Text('Welcome $name'),
             Form(
                 child: Column(
               children: [
-                Text('the logged in user: $theLoggedInUser'),
-
                 //user name
                 TextFormField(
                   controller: _userNameController,
@@ -60,24 +57,15 @@ class _LoginScreenState extends State<LoginScreen> {
                     });
                     name = name.trim(); //remove spaces
                     name = name.toLowerCase(); //convert to lowercase
-
                     await Provider.of<AuthService>(context, listen: false)
-                        .loginWithEmailAndPassword(name, password!)
-                        .then((value) {
-                      setState(() {
-                        theLoggedInUser = value!.user!.uid;
-                      });
-                      Navigator.pop(context);
-                    });
+                        .registerWithEmailAndPassword(name, password!);
+                    Navigator.pop(context); //pop the current screen
                   },
                   icon: Icon(
                     Icons.login,
                   ),
-                  label: Text(
-                    'Login',
-                  ),
+                  label: Text('Sign up'),
                 ),
-
                 //error
                 Provider.of<AuthService>(context).theError == null
                     ? Container()
@@ -94,7 +82,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     onPressed: () {
                       Navigator.pushNamed(context, '/privacyPolicyScreen');
                     },
-                    child: Text('Privacy Policy'))
+                    child: Text('Privacy Policy')),
               ],
             ))
           ],
